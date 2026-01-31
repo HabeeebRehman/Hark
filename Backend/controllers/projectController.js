@@ -1,4 +1,4 @@
-const Project = require('../model/project');
+const Project = require('../model/Project');
 const Workspace = require('../model/Workspace');
 
 const createProject = async (req, res) => {
