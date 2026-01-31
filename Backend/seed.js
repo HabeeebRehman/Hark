@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const User = require('./model/User');
 const Workspace = require('./model/Workspace');
-const Project = require('./model/Project');
+const Project = require('./model/ProjectModel');
 const Task = require('./model/Task');
 const connectDB = require('./config/db');
 
