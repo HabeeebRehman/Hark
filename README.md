@@ -4,6 +4,8 @@
 
 Hark is a comprehensive productivity management system that bridges the gap between project managers and developers through seamless collaboration. It consists of a web application for managers and a VS Code extension for developers.
 
+[Deployment link](https://hark-2c8e.vercel.app/)
+
 ---
 
 ## 📋 Overview
@@ -168,6 +170,8 @@ npm run compile
 
 # Open in VS Code and press F5 to run extension in development mode
 ```
+
+[Link to download extension](https://drive.google.com/file/d/1CpZ0dhABDf8hjZFaUO6USyvqlQujG4VW/view?usp=sharing)
 
 ---
 
