@@ -1,4 +1,4 @@
-const Project = require('../model/ProjectModel');
+const Project = require('../model/Project');
 const Workspace = require('../model/Workspace');
 
 const createProject = async (req, res) => {
@@ -43,8 +43,20 @@ const getProjects = async (req, res) => {
     const projects = await Project.find({ workspace: req.params.workspaceId })
       .populate('manager', 'username')
       .populate('developers', 'username email skills')
+      .populate({
+        path: 'tasks',
+        populate: { path: 'assignedTo', select: 'username _id' }
+      })
       .populate('files.assignedTo', 'username')
       .populate('files.uploadedBy', 'username');
+
+    // Debug logging to verify population
+    console.log("Fetched Projects Count:", projects.length);
+    if (projects.length > 0) {
+        console.log("First Project Developers:", JSON.stringify(projects[0].developers, null, 2));
+        console.log("First Project Tasks:", JSON.stringify(projects[0].tasks, null, 2));
+    }
+
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,6 +82,18 @@ const assignDeveloper = async (req, res) => {
     if (!project.developers.includes(userId)) {
       project.developers.push(userId);
       await project.save();
+    }
+
+    // Ensure user is also added to the workspace
+    const workspace = await Workspace.findById(project.workspace);
+    if (workspace) {
+      const isWorkspaceMember = workspace.members.some(
+        (m) => m.user.toString() === userId
+      );
+      if (!isWorkspaceMember) {
+        workspace.members.push({ user: userId, role: 'developer' });
+        await workspace.save();
+      }
     }
 
     res.json(project);

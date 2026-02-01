@@ -1,5 +1,5 @@
 const Task = require('../model/Task');
-const Project = require('../model/ProjectModel');
+const Project = require('../model/Project');
 
 const createTask = async (req, res) => {
   const { title, description, projectId, assignedTo, priority, dueDate } = req.body;
@@ -22,6 +22,8 @@ const createTask = async (req, res) => {
 
     project.tasks.push(task._id);
     await project.save();
+
+    await task.populate('assignedTo', 'username');
 
     res.status(201).json(task);
   } catch (error) {

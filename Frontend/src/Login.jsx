@@ -1,14 +1,36 @@
 import React, { useState } from 'react';
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
+import api from './lib/api';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password });
-    // Handle login logic here
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { token, ...user } = response.data;
+      
+      // Store token and user data
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,7 +47,6 @@ function Login() {
           }}
           pixelDensity={1}
           fov={45}
-          zoomOut={false}
         >
           <ShaderGradient
             animate="on"
@@ -35,14 +56,14 @@ function Login() {
             cDistance={2.8}
             cPolarAngle={80}
             cameraZoom={9.1}
-            color1="#606080"
-            color2="#8d7dca"
-            color3="#212121"
+            color1="#2563eb"
+            color2="#60a5fa"
+            color3="#1e3a8a"
             destination="onCanvas"
             embedMode="off"
             envPreset="city"
             format="gif"
-            frameRate={10}
+            frameRate={60}
             gizmoHelper="hide"
             grain="on"
             lightType="3d"
@@ -85,6 +106,11 @@ function Login() {
 
           {/* Login Form */}
           <div className="bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-2xl p-8 shadow-2xl">
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
@@ -135,9 +161,10 @@ function Login() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-blue-600/25 transition-all duration-200 transform hover:scale-[1.02]"
+                disabled={loading}
+                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-blue-600/25 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
 
@@ -182,7 +209,7 @@ function Login() {
       </div>
 
       {/* Prevent zoom and scroll */}
-      <style jsx>{`
+      <style>{`
         /* Prevent zoom on mobile */
         input[type="email"]:focus,
         input[type="password"]:focus {
@@ -195,33 +222,6 @@ function Login() {
           position: fixed;
           width: 100%;
           height: 100%;
-        }
-        
-        /* Prevent pinch zoom */
-        * {
-          touch-action: none;
-          -ms-touch-action: none;
-        }
-        
-        @media screen and (-webkit-min-device-pixel-ratio:0) {
-          select,
-          textarea,
-          input[type="text"],
-          input[type="password"],
-          input[type="datetime"],
-          input[type="datetime-local"],
-          input[type="date"],
-          input[type="month"],
-          input[type="time"],
-          input[type="week"],
-          input[type="number"],
-          input[type="email"],
-          input[type="url"],
-          input[type="search"],
-          input[type="tel"],
-          input[type="color"] {
-            font-size: 16px;
-          }
         }
       `}</style>
     </div>

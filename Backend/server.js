@@ -15,6 +15,9 @@ const port = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
+// CORS Middleware - Must be first
+app.use(cors()); // Allow all origins for development
+
 // Security Middleware
 app.use(helmet());
 
@@ -37,15 +40,6 @@ const limiter = rateLimit({
 });
 // Apply rate limiting to all requests
 app.use(limiter);
-
-// CORS Middleware
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || '*', // Allow all by default or set via env
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-};
-app.use(cors(corsOptions));
 
 // Body Parser Middleware
 app.use(express.json());

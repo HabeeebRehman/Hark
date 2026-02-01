@@ -41,7 +41,7 @@ const addMember = async (req, res) => {
 
     // Check if requester is admin of workspace
     const isMember = workspace.members.find(
-      (member) => member.user.toString() === req.user._id.toString() && member.role === 'admin'
+      (member) => member.user && member.user.toString() === req.user._id.toString() && member.role === 'admin'
     );
 
     if (!isMember && req.user.role !== 'admin') {
@@ -50,7 +50,7 @@ const addMember = async (req, res) => {
 
     // Check if user already in workspace
     const alreadyMember = workspace.members.find(
-      (member) => member.user.toString() === userId
+      (member) => member.user && member.user.toString() === userId
     );
 
     if (alreadyMember) {
